@@ -9,12 +9,13 @@
 import numpy as np
 import cv2, os
 
-number = '12'
-dir = "C:/Users/SerBeld/Desktop/Design_of_applications_through_the_use_of_artificial_vision_for_quality_control/Segmentation/Segmentation_HSV_AND_RGB/Colores_Dominantes"
+number = '1'
+dir = "C:/Users/SerBeld/Desktop/Artificial_vision_for_quality_control/Segmentation/Segmentation_HSV_AND_RGB/Colores_Dominantes"
+#file = '1_50K.png'
 file = number + '.png'
 
 img = cv2.imread(number + '.png')
-img = cv2.resize(img,(1000,1000))
+img = cv2.resize(img,(500,500))
 Z = img.reshape((-1,3))
 
 # Convierte a np.float32
@@ -22,7 +23,7 @@ Z = np.float32(Z)
 
 # Criterio, número de clusters(K) y aplica algoritmo de kmeans()
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-K = 10
+K = 50
 ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
 
 # Convierte a uint8, y crea la imagen
