@@ -1,14 +1,6 @@
 # Applications through the use of artificial vision for quality control in the Industrial sector
 Design of applications through the use of artificial vision for quality control in the Industrial sector...
 
-## Test
-
-<img src="vist.png" />
-
-## Segmentation
-
-<img src="Segmentación.png" />
-
 # How to download the libraries needed to compile the code
 Copy and paste each of the following commands into the CMD (Command Prompt) by entering the commands line by line only one at a time:
 
