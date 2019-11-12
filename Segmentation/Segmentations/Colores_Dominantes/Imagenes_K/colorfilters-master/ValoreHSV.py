@@ -1,7 +1,12 @@
 from colorfilters import HSVFilter
 import cv2 as cv
 
-img = cv.imread("6.png")
+cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+[rec, imagen] = cap.read()
+img = imagen
+
+#img = cv.imread("black.png")
+img = cv.resize(img,(300,300))
 window = HSVFilter(img)
 window.show()
 

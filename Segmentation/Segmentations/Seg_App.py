@@ -11,7 +11,7 @@ def segmentation(cap):
 
 	[rec, imagen] = cap.read()
 	#imagen = cv2.imread('imagen_1.png')
-	imagen = cv2.resize(imagen, (326,248))
+	#imagen = cv2.resize(imagen, (3260,2480))
 	#imagen[:,:,0] = cv2.blur(imagen[:,:,0] , (10,10))
 
 	hsv = cv2.cvtColor(imagen, cv2.COLOR_BGR2HSV)
@@ -49,8 +49,8 @@ def segmentation(cap):
 	#Filtro morfológico
 
 	# Definimos el Kernel
-	kernel = np.ones((2,2),np.uint8)
-	kernel2 = np.ones((5,5),np.uint8)
+	kernel = np.ones((10,10),np.uint8)
+	kernel2 = np.ones((20,20),np.uint8)
 	# Opening
 	#mascara_Rojo = cv2.morphologyEx(mascara_Rojo, cv2.MORPH_OPEN,kernel)
 	# Opening
@@ -64,13 +64,17 @@ def segmentation(cap):
 
 	#Mascara_de_la_Lata = dominante(mascara_Rojo,mascara_Dorado,mascara_Negro_1)
 
-	imagen = dibujar_cajas(imagen,mascara_Rojo,mascara_Dorado,mascara_Negro_1)
+	imagen = dibujar_cajas(imagen,mascara_Rojo,(rng.randint(0,100), rng.randint(0,100), rng.randint(200,256)))
+	imagen = dibujar_cajas(imagen,mascara_Dorado,(rng.randint(0,50), rng.randint(200,256), rng.randint(200,256)))
+	imagen = dibujar_cajas(imagen,mascara_Negro_1,(rng.randint(0,50), rng.randint(0,50), rng.randint(0,50)))
 
 	#Mostrar la mascara final y la imagen
+	cv2.namedWindow('Imagen Original',cv2.WND_PROP_FULLSCREEN)
+	cv2.setWindowProperty('Imagen Original', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 	cv2.imshow('Imagen Original', imagen)
-	cv2.imshow('Rojo', mascara_Rojo)
-	cv2.imshow('Dorado', mascara_Dorado)
-	cv2.imshow('Negro', mascara_Negro_1)
+	#cv2.imshow('Rojo', mascara_Rojo)
+	#cv2.imshow('Dorado', mascara_Dorado)
+	#cv2.imshow('Negro', mascara_Negro_1)
 	#cv2.imshow('Lata', Mascara_de_la_Lata)
 
 	return rec
@@ -98,35 +102,13 @@ def dominante(mascara_Rojo,mascara_Dorado,mascara_Negro_1):
 	if Area_Negra >= Area_Dorada and Area_Negra >= Area_Roja:
 		return mascara_Negro_1
 '''
-def dibujar_cajas(imagen,mascara_Rojo,mascara_Dorado,mascara_Negro_1):
+def dibujar_cajas(imagen,Mascara,color):
 
-	number_of_size = 30
+	number_of_size = 100 # Objetos inferiores a un area de number_of_size se desvanecen
+	min_canny = 20
+	max_canny = 100
 
-	canny_output = cv2.Canny(mascara_Rojo,10,600)
-
-	contour = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-	contours = contour[0]
-	contours_poly = [None]*len(contours)
-	boundRect = [None]*len(contours)
-	centers = [None]*len(contours)
-
-	for i, c in enumerate(contours):
-		contours_poly[i] = cv2.approxPolyDP(c, 3, True)
-		boundRect[i] = cv2.boundingRect(contours_poly[i])
-
-	for i in range(len(contours)):
-		#color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
-		#color = (255,0,0)
-		color = (256, rng.randint(0,256), 0)
-
-		if boundRect[i][3] >= number_of_size and boundRect[i][1]>= number_of_size:
-			offset = 0
-			cv2.rectangle(imagen, (int(boundRect[i][0]-offset), int(boundRect[i][1])-offset), \
-				(int(boundRect[i][0]+boundRect[i][2]+offset), int(boundRect[i][1]+boundRect[i][3]+offset)), color, 2)
-			#print("[" + str(boundRect[i][3]) + "," +  str(boundRect[i][1])+ "]")
-
-	canny_output = cv2.Canny(mascara_Dorado,10,600)
+	canny_output = cv2.Canny(Mascara,min_canny,max_canny)
 
 	contour = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -142,42 +124,17 @@ def dibujar_cajas(imagen,mascara_Rojo,mascara_Dorado,mascara_Negro_1):
 	for i in range(len(contours)):
 		#color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
 		#color = (255,0,0)
-		color = (256, rng.randint(0,256), 0)
+		#color = (rng.randint(200,256), rng.randint(200,256), rng.randint(200,256))
 
 		if boundRect[i][3] >= number_of_size and boundRect[i][1]>= number_of_size:
-			offset = 0
-			cv2.rectangle(imagen, (int(boundRect[i][0]-offset), int(boundRect[i][1])-offset), \
-				(int(boundRect[i][0]+boundRect[i][2]+offset), int(boundRect[i][1]+boundRect[i][3]+offset)), color, 2)
-			#print("[" + str(boundRect[i][3]) + "," +  str(boundRect[i][1])+ "]")
-
-	canny_output = cv2.Canny(mascara_Negro_1,10,600)
-
-	contour = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-	contours = contour[0]
-	contours_poly = [None]*len(contours)
-	boundRect = [None]*len(contours)
-	centers = [None]*len(contours)
-
-	for i, c in enumerate(contours):
-		contours_poly[i] = cv2.approxPolyDP(c, 3, True)
-		boundRect[i] = cv2.boundingRect(contours_poly[i])
-
-	for i in range(len(contours)):
-		#color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
-		#color = (255,0,0)
-		color = (256, rng.randint(0,256), 0)
-		if boundRect[i][3] >= number_of_size and boundRect[i][1]>= number_of_size:
-			offset = 0
-			cv2.rectangle(imagen, (int(boundRect[i][0]-offset), int(boundRect[i][1])-offset), \
-				(int(boundRect[i][0]+boundRect[i][2]+offset), int(boundRect[i][1]+boundRect[i][3]+offset)), color, 2)
-			#print("[" + str(boundRect[i][3]) + "," +  str(boundRect[i][1])+ "]")
+			cv2.rectangle(imagen, (int(boundRect[i][0]), int(boundRect[i][1])), \
+				(int(boundRect[i][0]+boundRect[i][2]), int(boundRect[i][1]+boundRect[i][3])), color, 2)
 
 	return imagen
 
 ############################################################################
 
-cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 while(True):
 
